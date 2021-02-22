@@ -57,7 +57,10 @@ def main():
                                                      orb_secret)
 
             # QUERY THE ORBITAL API
-            submit_orb_query(job, value, orb_url, orb_token, orb_nodes)
+            query_data = (folder, job, value)
+            orb_data = (orb_url, orb_token, orb_nodes)
+
+            submit_orb_query(query_data, orb_data)
 
 
 # STARTUP THE SCRIPT AND INITIALIZE MAIN
