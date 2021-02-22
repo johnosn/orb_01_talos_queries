@@ -39,16 +39,18 @@ def check_orb_table(value):
     return bool([ele for ele in bad_tables if ele in value['query']])
 
 
-def create_orb_payload(job, value, nodes):
+def create_orb_payload(query_data, nodes):
     """Create query json for sending to Orbital."""
     # CALCULATE QUERY EXPIRATION TIME
+    value = query_data[2]
     now = datetime.utcnow()
     expiry = now + timedelta(seconds=value['interval'])
     expiry = int(expiry.timestamp())
 
     # CREATE THE OSQUERY DATA
     osquery = [{"sql": value['query'],
-                "name": job}]
+                "name": query_data[1],
+                "label": query_data[0]}]
 
     # CREATE THE CONTEXT INFORMATION - DESCRIPTION
     context = {'description': value['description']}
@@ -78,7 +80,7 @@ def create_orb_payload(job, value, nodes):
     if nodes:
         payload = {'expiry': expiry,
                    'interval': value['interval'],
-                   'name': job,
+                   'name': query_data[1],
                    'osQuery': osquery,
                    'nodes': nodes,
                    'context': context,
@@ -88,7 +90,7 @@ def create_orb_payload(job, value, nodes):
     else:
         payload = {'expiry': expiry,
                    'interval': value['interval'],
-                   'name': job,
+                   'name': query_data[1],
                    'osQuery': osquery,
                    'os': value['platform'],
                    'context': context,
@@ -110,17 +112,18 @@ def check_orb_response(response):
         return False
 
 
-def submit_orb_query(job, value, orb_url, orb_token, orb_nodes):
+def submit_orb_query(query_data, orb_data):
     """Submit query to Orbital API."""
     # CHECK ORBITAL TABLE
-    if check_orb_table(value):
-        print("FAILED: " + job + " contains a table not used by Orbital")
+    if check_orb_table(query_data[2]):
+        print("FAILED: " + query_data[1] +
+              " contains a table not used by Orbital")
         return
 
     # CREATE ORBITAL REQUEST INFORMATION
-    url = "{0}query".format(orb_url)
-    payload = create_orb_payload(job, value, orb_nodes)
-    headers = {'Authorization': orb_token,
+    url = "{0}query".format(orb_data[0])
+    payload = create_orb_payload(query_data, orb_data[2])
+    headers = {'Authorization': orb_data[1],
                'Content-Type': 'application/json',
                'Accept': 'application/json'}
 
@@ -133,4 +136,4 @@ def submit_orb_query(job, value, orb_url, orb_token, orb_nodes):
     if is_ok:
         r_json = response.json()
         print("SUCCESS: submitted job id: " + r_json['ID'] +
-              " for query: " + job)
+              " for query: " + query_data[1])
