@@ -9,9 +9,6 @@ from util.pull_git import check_git
 from util.folder import process_folder
 from util.orbital import gen_orb_auth, check_orb_expiry, submit_orb_query
 
-# THREAT INTELLIGENCE DATA TYPES
-folders = ['win_attacks', 'win_forensics', 'win_malware']
-
 # START MAIN SCRIPT BODY
 # SET CONFIGURATION FILE VALUES
 CFG_FILE = r'.\api.cfg'
