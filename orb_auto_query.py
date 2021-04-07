@@ -19,6 +19,7 @@ config.read(CFG_FILE)
 orb_url = config.get('ORB', 'url')
 orb_client = config.get('ORB', 'client')
 orb_secret = config.get("ORB", 'secret')
+orb_webhookid = config.get("ORB", 'webhookid')
 try:
     orb_nodes = ast.literal_eval(config.get('ORB', 'nodes'))
 except configparser.NoOptionError:
@@ -55,8 +56,7 @@ def main():
 
             # QUERY THE ORBITAL API
             query_data = (folder, job, value)
-            orb_data = (orb_url, orb_token, orb_nodes)
-
+            orb_data = (orb_url, orb_token, orb_nodes, orb_webhookid)
             submit_orb_query(query_data, orb_data)
 
 
