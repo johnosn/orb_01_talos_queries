@@ -39,7 +39,7 @@ def check_orb_table(value):
     return bool([ele for ele in bad_tables if ele in value['query']])
 
 
-def create_orb_payload(query_data, nodes):
+def create_orb_payload(query_data, nodes, webhookid):
     """Create query json for sending to Orbital."""
     # CALCULATE QUERY EXPIRATION TIME
     value = query_data[2]
@@ -77,25 +77,22 @@ def create_orb_payload(query_data, nodes):
     except KeyError:
         pass
 
-    if nodes:
-        payload = {'expiry': expiry,
-                   'interval': value['interval'],
-                   'name': query_data[1],
-                   'osQuery': osquery,
-                   'nodes': nodes,
-                   'context': context,
-                   'snapshot': value['snapshot']}
-        payload = json.dumps(payload, ensure_ascii=True)
+    payload = {'expiry': expiry,
+               'interval': value['interval'],
+               'name': query_data[1],
+               'osQuery': osquery,
+               'context': context,
+               'snapshot': value['snapshot']}
 
+    if nodes:
+        payload["nodes"] = nodes
     else:
-        payload = {'expiry': expiry,
-                   'interval': value['interval'],
-                   'name': query_data[1],
-                   'osQuery': osquery,
-                   'os': value['platform'],
-                   'context': context,
-                   'snapshot': value['snapshot']}
-        payload = json.dumps(payload, ensure_ascii=True)
+        payload["os"] = value['platform']
+
+    if webhookid:
+        payload["postbacks"] = [{"webhookid": webhookid}]
+
+    payload = json.dumps(payload, ensure_ascii=True)
     return payload
 
 
@@ -122,7 +119,7 @@ def submit_orb_query(query_data, orb_data):
 
     # CREATE ORBITAL REQUEST INFORMATION
     url = "{0}query".format(orb_data[0])
-    payload = create_orb_payload(query_data, orb_data[2])
+    payload = create_orb_payload(query_data, orb_data[2], orb_data[3])
     headers = {'Authorization': orb_data[1],
                'Content-Type': 'application/json',
                'Accept': 'application/json'}
