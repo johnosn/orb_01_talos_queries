@@ -85,12 +85,12 @@ def create_orb_payload(query_data, nodes, webhookid):
                'snapshot': value['snapshot']}
 
     if nodes:
-        payload["nodes"] = nodes
+        payload['nodes'] = nodes
     else:
-        payload["os"] = value['platform']
+        payload['os'] = value['platform']
 
     if webhookid:
-        payload["postbacks"] = [{"webhookid": webhookid}]
+        payload['postbacks'] = [{'webhookid': webhookid}]
 
     payload = json.dumps(payload, ensure_ascii=True)
     return payload
