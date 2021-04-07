@@ -19,7 +19,12 @@ config.read(CFG_FILE)
 orb_url = config.get('ORB', 'url')
 orb_client = config.get('ORB', 'client')
 orb_secret = config.get("ORB", 'secret')
-orb_webhookid = config.get("ORB", 'webhookid')
+
+try:
+    orb_webhookid = config.get('ORB', 'webhookid')
+except configparser.NoOptionError:
+    orb_webhookid = None
+
 try:
     orb_nodes = ast.literal_eval(config.get('ORB', 'nodes'))
 except configparser.NoOptionError:
